@@ -127,7 +127,7 @@ def main(args):
 
     # Exercise 1
     # TODO: For CartPole-v0 - maximum episode length
-    env._max_episode_steps = 200
+    env._max_episode_steps = 500
 
     # Get dimensionalities of actions and observations
     action_space_dim = get_space_dim(env.action_space)
