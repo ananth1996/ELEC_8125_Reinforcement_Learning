@@ -49,7 +49,7 @@ def train(agent, env, train_episodes, early_stop=True, render=False,
             observation, reward, done, info = env.step(action)
 
             # TODO: Task 1 - change the reward function
-            # reward = new_reward(observation)
+            reward = new_reward(observation)
 
             # Store action's outcome (so that the agent can improve its policy)
             agent.store_outcome(previous_observation, action_probabilities, action, reward)
@@ -107,7 +107,7 @@ def test(agent, env, episodes, render=False):
             action, _ = agent.get_action(observation, evaluation=True)
             observation, reward, done, info = env.step(action)
             # TODO: New reward function
-            # reward = new_reward(observation)
+            reward = new_reward(observation)
             if render:
                 env.render()
             test_reward += reward
@@ -117,7 +117,7 @@ def test(agent, env, episodes, render=False):
 
 # TODO: Definition of the modified reward function
 def new_reward(state):
-    return 1
+    return (2.4-np.abs(state[0]-1))/2.4
 
 
 # The main function
@@ -127,7 +127,7 @@ def main(args):
 
     # Exercise 1
     # TODO: For CartPole-v0 - maximum episode length
-    env._max_episode_steps = 500
+    env._max_episode_steps = 200
 
     # Get dimensionalities of actions and observations
     action_space_dim = get_space_dim(env.action_space)
