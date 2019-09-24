@@ -8,7 +8,7 @@ import pandas as pd
 import sys
 from agent import Agent, Policy
 from utils import get_space_dim
-
+from pathlib import Path
 
 # Parse script arguments
 def parse_args(args=sys.argv[1:]):
@@ -21,13 +21,17 @@ def parse_args(args=sys.argv[1:]):
                         help="Number of episodes to train for")
     parser.add_argument("--render_training", action='store_true',
                         help="Render each frame during training. Will be slower.")
+    parser.add_argument("--x0", type=int,default=0,
+                        help="Location to train near")
+    parser.add_argument("--episode_length",type=int,default=200,
+                        help="The number of timesteps in an episode")
     parser.add_argument("--render_test", action='store_true', help="Render test")
     return parser.parse_args(args)
 
 
 # Policy training function
 def train(agent, env, train_episodes, early_stop=True, render=False,
-          silent=False, train_run_id=0):
+          silent=False, train_run_id=0,x0=0,args=None,policy=None):
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []
     average_reward_history = []
@@ -49,7 +53,7 @@ def train(agent, env, train_episodes, early_stop=True, render=False,
             observation, reward, done, info = env.step(action)
 
             # TODO: Task 1 - change the reward function
-            reward = new_reward(observation)
+            reward = new_reward(observation,x0)
 
             # Store action's outcome (so that the agent can improve its policy)
             agent.store_outcome(previous_observation, action_probabilities, action, reward)
@@ -66,6 +70,10 @@ def train(agent, env, train_episodes, early_stop=True, render=False,
             print("Episode {} finished. Total reward: {:.3g} ({} timesteps)"
                   .format(episode_number, reward_sum, timesteps))
 
+        if episode_number%20 ==0 :
+            model_folder = Path(__file__).parent / "models"
+            model_file = f"{args.env}_params{episode_number}.mdl"
+        torch.save(policy.state_dict(), model_folder/model_file)
         # Bookkeeping (mainly for generating plots)
         reward_history.append(reward_sum)
         timestep_history.append(timesteps)
@@ -94,7 +102,7 @@ def train(agent, env, train_episodes, early_stop=True, render=False,
 
 
 # Function to test a trained policy
-def test(agent, env, episodes, render=False):
+def test(agent, env, episodes, render=False,x0=0):
     test_reward, test_len = 0, 0
     for ep in range(episodes):
         done = False
@@ -107,7 +115,7 @@ def test(agent, env, episodes, render=False):
             action, _ = agent.get_action(observation, evaluation=True)
             observation, reward, done, info = env.step(action)
             # TODO: New reward function
-            reward = new_reward(observation)
+            reward = new_reward(observation,x0)
             if render:
                 env.render()
             test_reward += reward
@@ -116,9 +124,11 @@ def test(agent, env, episodes, render=False):
 
 
 # TODO: Definition of the modified reward function
-def new_reward(state):
-    return (2.4-np.abs(state[0]-1))/2.4
-
+def new_reward(state,x0):
+    # return 1/(1+(x0-state[0])**2) 
+    # return  0.5 + 0.5*np.abs(np.tanh(state[1])/300) + 0.5*np.abs(np.tanh(state[3])/300)
+    # return 1+np.abs(state[1])
+    return 1
 
 # The main function
 def main(args):
@@ -127,7 +137,7 @@ def main(args):
 
     # Exercise 1
     # TODO: For CartPole-v0 - maximum episode length
-    env._max_episode_steps = 200
+    env._max_episode_steps = args.episode_length
 
     # Get dimensionalities of actions and observations
     action_space_dim = get_space_dim(env.action_space)
@@ -146,7 +156,7 @@ def main(args):
     # If no model was passed, train a policy from scratch.
     # Otherwise load the policy from the file and go directly to testing.
     if args.test is None:
-        training_history = train(agent, env, args.train_episodes, False, args.render_training)
+        training_history = train(agent, env, args.train_episodes, False, args.render_training,x0=args.x0,args=args,policy=policy)
 
         # Save the model
         model_file = "%s_params.mdl" % args.env
@@ -165,7 +175,7 @@ def main(args):
         state_dict = torch.load(args.test)
         policy.load_state_dict(state_dict)
         print("Testing...")
-        test(agent, env, args.train_episodes, args.render_test)
+        test(agent, env, args.train_episodes, args.render_test,x0=args.x0)
 
 
 # Entry point of the script

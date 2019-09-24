@@ -1,3 +1,5 @@
 Books and Materials
 RL.code-workspace
 *.pyc
+models/
+.vscode/settings.json
