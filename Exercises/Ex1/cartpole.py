@@ -125,10 +125,9 @@ def test(agent, env, episodes, render=False,x0=0):
 
 # TODO: Definition of the modified reward function
 def new_reward(state,x0):
-    # return 1/(1+(x0-state[0])**2) 
-    # return  0.5 + 0.5*np.abs(np.tanh(state[1])/300) + 0.5*np.abs(np.tanh(state[3])/300)
-    # return 1+np.abs(state[1])
-    return 1
+    return 1/(1+(x0-state[0])**2)  # for 1 and 2
+    # return  0.3 + 0.7*np.abs(np.tanh(state[1]/2)) # little more ideal
+    # return 1+np.min([1,np.abs(state[1])]) + np.sin(state[2])  # for 3 
 
 # The main function
 def main(args):
