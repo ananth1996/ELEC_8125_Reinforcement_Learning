@@ -124,7 +124,7 @@ def test(agent, env, episodes, render=False,x0=0):
 
 def new_reward(state,x0):
     #! Swap function based on task
-    return fast_reward(state)
+    return x0_reward(state,x0)
 
 def fast_reward(state):
     return  0.3 + 0.7*np.abs(np.tanh(state[1]/2)) # little more ideal

@@ -49,7 +49,7 @@ This is a big issue as then we need to compare RL algorithms on an average abili
         \caption{Reward function for $x0=0$. Here x-axis is position of agent}
         \label{fig:reward-0}
     \end{figure}
-    This can be verified using the \textit{CartPole-v0\_params-center} model.
+    This can be verified using the \textit{CartPole-v0\_params\_x0\_0} model.
 \subsection{Incentive to stay at $x=x_0$}
     This task was somewhat more complex as there needs to be enough incentive for the pole to remain upright along with incentive to move towards the location. Then rewards must also be reduced so that the agent "sticks" to the location once it reaches it.
     Initially a reward function worked for training at staying at $x=2$, but then the logic didn't generalize when training for any $x_0$. The function was something as seen in Figure~\ref{fig:kinda}
