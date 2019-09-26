@@ -3,3 +3,4 @@ RL.code-workspace
 *.pyc
 models/
 .vscode/settings.json
+_minted*/

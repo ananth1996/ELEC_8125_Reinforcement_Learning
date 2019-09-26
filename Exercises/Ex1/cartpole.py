@@ -114,7 +114,6 @@ def test(agent, env, episodes, render=False,x0=0):
             # the best action - there is no exploration at this point)
             action, _ = agent.get_action(observation, evaluation=True)
             observation, reward, done, info = env.step(action)
-            # TODO: New reward function
             reward = new_reward(observation,x0)
             if render:
                 env.render()
@@ -123,19 +122,33 @@ def test(agent, env, episodes, render=False,x0=0):
     print("Average test reward:", test_reward/episodes, "episode length:", test_len/episodes)
 
 
-# TODO: Definition of the modified reward function
 def new_reward(state,x0):
-    return 1/(1+(x0-state[0])**2)  # for 1 and 2
-    # return  0.3 + 0.7*np.abs(np.tanh(state[1]/2)) # little more ideal
-    # return 1+np.min([1,np.abs(state[1])]) + np.sin(state[2])  # for 3 
+    #! Swap function based on task
+    return fast_reward(state)
 
+def fast_reward(state):
+    return  0.3 + 0.7*np.abs(np.tanh(state[1]/2)) # little more ideal
+
+def x0_reward(state,x0):
+    return 1/(1+200*(x0-state[0])**2)  # for x0=1
+
+def failed_x0_reward(state,x0):
+    if x0 >= 0:
+        if state[0]<=x0:
+            return 1/(1+20*(x0-state[0])**2)
+        else:
+            return np.power(np.e,-100*np.abs(state[0]-x0))
+    else:
+        if state[0]<=x0:
+            return np.power(np.e,-100*np.abs(state[0]-x0))
+        else:
+            return 1/(1+20*(x0-state[0])**2)
 # The main function
 def main(args):
     # Create a Gym environment
     env = gym.make(args.env)
 
     # Exercise 1
-    # TODO: For CartPole-v0 - maximum episode length
     env._max_episode_steps = args.episode_length
 
     # Get dimensionalities of actions and observations
