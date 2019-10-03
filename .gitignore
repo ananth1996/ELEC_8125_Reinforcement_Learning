@@ -4,3 +4,4 @@ RL.code-workspace
 models/
 .vscode/settings.json
 _minted*/
+*.zip
