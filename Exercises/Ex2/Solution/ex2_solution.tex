@@ -9,7 +9,7 @@
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \SetupFloatingEnvironment{listing}{name=Code}
 
-\title{RL Homework 1}
+\title{RL Homework 2}
 \author{Ananth Mahadevan}
 \begin{document}
 \maketitle
@@ -58,5 +58,5 @@ v_{\pi}(s) \doteq \mathbb{E}_{\pi} \left [ G_{t} | S_{t}=s \right ]
 \]
 Hence the value function of a state is equal to the mean of the discounted rewards.
 \section{Question 6}
-No. Just no.
+No the value iteration approach cannot be applied to the suggested problem. Value iteration converges under the conditions that we have complete knowledge of the state space and to some degree know the dynamics of the system. In the given problem when the robot is navigating an unknown environment the assumptions of this knowledge of the state space, rewards, and transition probabilities are unrealistic.
 \end{document}
