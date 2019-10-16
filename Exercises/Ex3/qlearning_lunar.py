@@ -2,23 +2,27 @@
 import gym
 import numpy as np
 from matplotlib import pyplot as plt
-import seaborn as sns
 
 np.random.seed(123)
 
-env = gym.make('CartPole-v0')
+env = gym.make('LunarLander-v2')
 env.seed(321)
 
 episodes = 20000
 test_episodes = 10
-num_of_actions = 2
+num_of_actions = 4
 
 # Reasonable values for Cartpole discretization
 discr = 16
-x_min, x_max = -2.4, 2.4
-v_min, v_max = -3, 3
-th_min, th_max = -0.3, 0.3
-av_min, av_max = -4, 4
+x_min, x_max = -1.2, 1.2
+y_min, y_max = -0.3, 1.2
+vx_min, vx_max = -2.4, 2.4
+vy_min, vy_max = -2, 2
+th_min, th_max = -6.28, 6.28
+av_min, av_max = -8, 8
+cl_min, cl_max = 0, 1
+cr_min, cr_max = 0, 1
+
 
 # For LunarLander, use the following values:
 #         [  x     y  xdot ydot theta  thetadot cl  cr
@@ -34,24 +38,30 @@ initial_q = 0  # T3: Set to 50
 
 # Create discretization grid
 x_grid = np.linspace(x_min, x_max, discr)
-v_grid = np.linspace(v_min, v_max, discr)
+y_grid = np.linspace(y_min, y_max, discr)
+vx_grid = np.linspace(vx_min, vx_max, discr)
+vy_grid = np.linspace(vy_min, vy_max, discr)
 th_grid = np.linspace(th_min, th_max, discr)
 av_grid = np.linspace(av_min, av_max, discr)
+# cl_grid = np.linspace(cl_min,cl_max,2)
+# cr_grid = np.linspace(cr_min,cr_max,2)
 
-discrete_grid = np.vstack((x_grid,v_grid,th_grid,av_grid))
+discrete_grid = np.vstack((x_grid,y_grid,vx_grid,vy_grid,th_grid,av_grid))
 
-q_grid = np.zeros((discr, discr, discr, discr, num_of_actions)) + initial_q
+q_grid = np.zeros((discr, discr,discr,discr, discr, discr,2,2, num_of_actions)) + initial_q
 #%%
 
 def state_grid_loc(state):
     # subtract the state from the discrete grid buckets
     # Then find the location of the bucket by argmin over the columns
-    loc = np.argmin(np.abs(state-discrete_grid.T),axis=0)
+    loc = np.argmin(np.abs(state[:-2]-discrete_grid.T),axis=0)
+    loc = np.append(loc,state[-2:].astype(np.int))
     loc = tuple(loc)
     return loc 
 
 def update_q(q_grid,state,action,reward,new_state):
     state_action = (*state_grid_loc(state),action)
+    # print(state_action)
     q_sa = q_grid[state_action]
     new_action = np.argmax(q_grid[state_grid_loc(new_state)])
     new_state_action = (*state_grid_loc(new_state),new_action)
@@ -67,7 +77,7 @@ for ep in range(episodes+test_episodes):
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
         if np.random.rand() <= epsilon:
-            action = int(np.random.rand()*2)
+            action = np.random.randint(4)
         else:
             action = q_grid[state_grid_loc(state)].argmax()
         new_state, reward, done, _ = env.step(action)
@@ -86,18 +96,16 @@ for ep in range(episodes+test_episodes):
 # Save the Q-value array
 np.save("q_values.npy", q_grid)  # TODO: SUBMIT THIS Q_VALUES.NPY ARRAY
 
-# Calculate the value function
-values = np.zeros(q_grid.shape[:-1])  # TODO: COMPUTE THE VALUE FUNCTION FROM THE Q-GRID
-values = np.max(q_grid,axis=4)
-np.save("value_func.npy", values)  # TODO: SUBMIT THIS VALUE_FUNC.NPY ARRAY
+# # Calculate the value function
+# values = np.zeros(q_grid.shape[:-1])  # TODO: COMPUTE THE VALUE FUNCTION FROM THE Q-GRID
+# values = np.max(q_grid,axis=4)
+# np.save("value_func.npy", values)  # TODO: SUBMIT THIS VALUE_FUNC.NPY ARRAY
 
-heatmap = np.mean(values,axis=(1,3))
-# Plot the heatmap
-# TODO: Plot the heatmap here using Seaborn or Matplotlib
-sns.heatmap(heatmap)
-plt.xticks(range(16),[str(round(x,1)) for x in x_grid])
-plt.yticks(range(16),[str(round(x,1)) for x in th_grid])
-plt.show()
+# heatmap = np.mean(values,axis=(1,3))
+# # Plot the heatmap
+# # TODO: Plot the heatmap here using Seaborn or Matplotlib
+# plt.imshow(heatmap)
+# plt.show()
 # Draw plots
 plt.plot(ep_lengths)
 plt.plot(epl_avg)
@@ -105,3 +113,6 @@ plt.legend(["Episode length", "500 episode average"])
 plt.title("Episode lengths")
 plt.show()
 
+
+
+#%%
