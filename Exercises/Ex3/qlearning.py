@@ -63,7 +63,7 @@ ep_lengths, epl_avg = [], []
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
-    epsilon = a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
+    epsilon = 0# a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
         if np.random.rand() <= epsilon:
