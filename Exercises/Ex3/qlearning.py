@@ -29,7 +29,7 @@ av_min, av_max = -4, 4
 gamma = 0.98
 alpha = 0.1
 target_eps = 0.1
-a = 20000/9  # TODO: Set the correct value.
+a = int(20000/9)  # TODO: Set the correct value.
 initial_q = 0  # T3: Set to 50
 
 # Create discretization grid
@@ -42,6 +42,19 @@ discrete_grid = np.vstack((x_grid,v_grid,th_grid,av_grid))
 
 q_grid = np.zeros((discr, discr, discr, discr, num_of_actions)) + initial_q
 #%%
+def plot_heatmap(q_grid,it):
+    values = np.zeros(q_grid.shape[:-1])  # TODO: COMPUTE THE VALUE FUNCTION FROM THE Q-GRID
+    values = np.max(q_grid,axis=4)
+    heatmap = np.mean(values,axis=(1,3))
+    # Plot the heatmap
+    # TODO: Plot the heatmap here using Seaborn or Matplotlib
+    sns.heatmap(heatmap)
+    plt.title(f"Value function heatmap at {it} iterations")
+    plt.xlabel("x")
+    plt.ylabel(r"$\theta$")
+    plt.xticks(range(16),[str(round(x,1)) for x in x_grid])
+    plt.yticks(range(16),[str(round(x,1)) for x in th_grid])
+    plt.show()
 
 def state_grid_loc(state):
     # subtract the state from the discrete grid buckets
@@ -63,7 +76,7 @@ ep_lengths, epl_avg = [], []
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
-    epsilon = 0# a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
+    epsilon = a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
         if np.random.rand() <= epsilon:
@@ -82,7 +95,8 @@ for ep in range(episodes+test_episodes):
     epl_avg.append(np.mean(ep_lengths[max(0, ep-500):]))
     if ep % 200 == 0:
         print("Episode {}, average timesteps: {:.2f}".format(ep, np.mean(ep_lengths[max(0, ep-200):])))
-
+    if ep ==0 or ep == episodes/2:
+        plot_heatmap(q_grid,ep)
 # Save the Q-value array
 np.save("q_values.npy", q_grid)  # TODO: SUBMIT THIS Q_VALUES.NPY ARRAY
 
@@ -91,13 +105,7 @@ values = np.zeros(q_grid.shape[:-1])  # TODO: COMPUTE THE VALUE FUNCTION FROM TH
 values = np.max(q_grid,axis=4)
 np.save("value_func.npy", values)  # TODO: SUBMIT THIS VALUE_FUNC.NPY ARRAY
 
-heatmap = np.mean(values,axis=(1,3))
-# Plot the heatmap
-# TODO: Plot the heatmap here using Seaborn or Matplotlib
-sns.heatmap(heatmap)
-plt.xticks(range(16),[str(round(x,1)) for x in x_grid])
-plt.yticks(range(16),[str(round(x,1)) for x in th_grid])
-plt.show()
+plot_heatmap(q_grid,episodes)
 # Draw plots
 plt.plot(ep_lengths)
 plt.plot(epl_avg)
