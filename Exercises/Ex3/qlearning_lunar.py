@@ -34,7 +34,7 @@ gamma = 0.98
 alpha = 0.1
 target_eps = 0.1
 a = 20000/9  # TODO: Set the correct value.
-initial_q = 0  # T3: Set to 50
+initial_q = 200  # T3: Set to 50
 
 # Create discretization grid
 x_grid = np.linspace(x_min, x_max, discr)
