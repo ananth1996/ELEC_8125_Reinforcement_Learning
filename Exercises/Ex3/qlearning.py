@@ -10,7 +10,7 @@ env = gym.make('CartPole-v0')
 env.seed(321)
 
 episodes = 20000
-test_episodes = 10
+test_episodes = 0
 num_of_actions = 2
 
 # Reasonable values for Cartpole discretization
@@ -30,7 +30,7 @@ gamma = 0.98
 alpha = 0.1
 target_eps = 0.1
 a = int(20000/9)  # TODO: Set the correct value.
-initial_q = 0  # T3: Set to 50
+initial_q = 50  # T3: Set to 50
 
 # Create discretization grid
 x_grid = np.linspace(x_min, x_max, discr)
@@ -50,10 +50,10 @@ def plot_heatmap(q_grid,it):
     # TODO: Plot the heatmap here using Seaborn or Matplotlib
     sns.heatmap(heatmap)
     plt.title(f"Value function heatmap at {it} iterations")
-    plt.xlabel("x")
-    plt.ylabel(r"$\theta$")
-    plt.xticks(range(16),[str(round(x,1)) for x in x_grid])
-    plt.yticks(range(16),[str(round(x,1)) for x in th_grid])
+    plt.ylabel("x")
+    plt.xlabel(r"$\theta$")
+    plt.yticks(range(16),[str(round(x,1)) for x in x_grid],fontsize='small')
+    plt.xticks(range(16),[str(round(x,1)) for x in th_grid],fontsize='small')
     plt.show()
 
 def state_grid_loc(state):
@@ -63,12 +63,16 @@ def state_grid_loc(state):
     loc = tuple(loc)
     return loc 
 
-def update_q(q_grid,state,action,reward,new_state):
+def update_q(q_grid,state,action,reward,new_state,done):
     state_action = (*state_grid_loc(state),action)
     q_sa = q_grid[state_action]
     new_action = np.argmax(q_grid[state_grid_loc(new_state)])
     new_state_action = (*state_grid_loc(new_state),new_action)
-    q_sa = q_sa + alpha*(reward+gamma*q_grid[new_state_action] - q_sa)
+    if not done:
+        q_next_sa = q_grid[new_state_action]
+    else:
+        q_next_sa = 0
+    q_sa = q_sa + alpha*(reward+gamma*q_next_sa - q_sa)
     q_grid[state_action] = q_sa
 
 # Training loop
@@ -76,7 +80,7 @@ ep_lengths, epl_avg = [], []
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
-    epsilon = 0 #a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
+    epsilon = 0  # T1: GLIE/constant, T3: Set to 0
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
         if np.random.rand() <= epsilon:
@@ -86,7 +90,7 @@ for ep in range(episodes+test_episodes):
         new_state, reward, done, _ = env.step(action)
         if not test:
             # TODO: ADD HERE YOUR Q_VALUE FUNCTION UPDATE
-            update_q(q_grid,state,action,reward,new_state)
+            update_q(q_grid,state,action,reward,new_state,done)
         else:
             env.render()
         state = new_state
@@ -98,6 +102,7 @@ for ep in range(episodes+test_episodes):
     if ep ==0 or ep == episodes/2:
         plot_heatmap(q_grid,ep)
 # Save the Q-value array
+#%%
 np.save("q_values.npy", q_grid)  # TODO: SUBMIT THIS Q_VALUES.NPY ARRAY
 
 # Calculate the value function

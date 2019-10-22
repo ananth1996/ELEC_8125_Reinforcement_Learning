@@ -33,7 +33,7 @@ cr_min, cr_max = 0, 1
 gamma = 0.98
 alpha = 0.1
 target_eps = 0.1
-a = 20000/9  # TODO: Set the correct value.
+a = int(20000/9)  # TODO: Set the correct value.
 initial_q = 200  # T3: Set to 50
 
 # Create discretization grid
@@ -59,13 +59,16 @@ def state_grid_loc(state):
     loc = tuple(loc)
     return loc 
 
-def update_q(q_grid,state,action,reward,new_state):
+def update_q(q_grid,state,action,reward,new_state,done):
     state_action = (*state_grid_loc(state),action)
-    # print(state_action)
     q_sa = q_grid[state_action]
     new_action = np.argmax(q_grid[state_grid_loc(new_state)])
     new_state_action = (*state_grid_loc(new_state),new_action)
-    q_sa = q_sa + alpha*(reward+gamma*q_grid[new_state_action] - q_sa)
+    if not done:
+        q_next_sa = q_grid[new_state_action]
+    else:
+        q_next_sa = 0
+    q_sa = q_sa + alpha*(reward+gamma*q_next_sa - q_sa)
     q_grid[state_action] = q_sa
 
 # Training loop
@@ -83,7 +86,7 @@ for ep in range(episodes+test_episodes):
         new_state, reward, done, _ = env.step(action)
         if not test:
             # TODO: ADD HERE YOUR Q_VALUE FUNCTION UPDATE
-            update_q(q_grid,state,action,reward,new_state)
+            update_q(q_grid,state,action,reward,new_state,done)
         else:
             env.render()
         state = new_state
