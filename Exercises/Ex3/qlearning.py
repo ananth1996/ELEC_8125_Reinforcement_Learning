@@ -30,7 +30,7 @@ gamma = 0.98
 alpha = 0.1
 target_eps = 0.1
 a = int(20000/9)  # TODO: Set the correct value.
-initial_q = 50  # T3: Set to 50
+initial_q = 0  # T3: Set to 50
 
 # Create discretization grid
 x_grid = np.linspace(x_min, x_max, discr)
@@ -80,7 +80,7 @@ ep_lengths, epl_avg = [], []
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
-    epsilon = 0  # T1: GLIE/constant, T3: Set to 0
+    epsilon = a/(a+ep)# T1: GLIE/constant, T3: Set to 0
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
         if np.random.rand() <= epsilon:
@@ -99,7 +99,7 @@ for ep in range(episodes+test_episodes):
     epl_avg.append(np.mean(ep_lengths[max(0, ep-500):]))
     if ep % 200 == 0:
         print("Episode {}, average timesteps: {:.2f}".format(ep, np.mean(ep_lengths[max(0, ep-200):])))
-    if ep ==0 or ep == episodes/2:
+    if ep== 0 or ep==1 or ep == episodes/2:
         plot_heatmap(q_grid,ep)
 # Save the Q-value array
 #%%
