@@ -73,9 +73,12 @@ def update_q(q_grid,state,action,reward,new_state,done):
 
 # Training loop
 ep_lengths, epl_avg = [], []
+rewards, rewards_avg =[], []
+
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
+    cumulative_rewards =0
     epsilon = a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
     while not done:
         # TODO: IMPLEMENT HERE EPSILON-GREEDY
@@ -91,10 +94,13 @@ for ep in range(episodes+test_episodes):
             env.render()
         state = new_state
         steps += 1
+        cumulative_rewards+= reward
     ep_lengths.append(steps)
     epl_avg.append(np.mean(ep_lengths[max(0, ep-500):]))
+    rewards.append(cumulative_rewards)
+    rewards_avg.append(np.mean(rewards[max(0,ep-500):]))
     if ep % 200 == 0:
-        print("Episode {}, average timesteps: {:.2f}".format(ep, np.mean(ep_lengths[max(0, ep-200):])))
+        print("Episode {}, average timesteps: {:.2f}, average rewards: {:.2f}".format(ep, np.mean(ep_lengths[max(0, ep-200):]), np.mean(rewards[max(0, ep-200):])))
 
 # Save the Q-value array
 np.save("q_values.npy", q_grid)  # TODO: SUBMIT THIS Q_VALUES.NPY ARRAY
@@ -116,6 +122,11 @@ plt.legend(["Episode length", "500 episode average"])
 plt.title("Episode lengths")
 plt.show()
 
+plt.plot(rewards)
+plt.plot(rewards_avg)
+plt.legend(["Cumulative Rewards", "500 episode average"])
+plt.title("Cumulative Rewards ")
+plt.show()
 
 
 #%%
