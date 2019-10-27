@@ -77,7 +77,7 @@ rewards, rewards_avg =[], []
 
 for ep in range(episodes+test_episodes):
     test = ep > episodes
-    state, done, steps = env.reset(), False, 0
+    state, done, steps = env.reset(),   False, 0
     cumulative_rewards =0
     epsilon = a/(a+ep)  # T1: GLIE/constant, T3: Set to 0
     while not done:

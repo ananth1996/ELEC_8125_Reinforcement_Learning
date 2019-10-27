@@ -77,6 +77,7 @@ def update_q(q_grid,state,action,reward,new_state,done):
 
 # Training loop
 ep_lengths, epl_avg = [], []
+plot_heatmap(q_grid,0)
 for ep in range(episodes+test_episodes):
     test = ep > episodes
     state, done, steps = env.reset(), False, 0
@@ -99,8 +100,8 @@ for ep in range(episodes+test_episodes):
     epl_avg.append(np.mean(ep_lengths[max(0, ep-500):]))
     if ep % 200 == 0:
         print("Episode {}, average timesteps: {:.2f}".format(ep, np.mean(ep_lengths[max(0, ep-200):])))
-    if ep== 0 or ep==1 or ep == episodes/2:
-        plot_heatmap(q_grid,ep)
+    if ep==0 or ep == episodes/2-1:
+        plot_heatmap(q_grid,ep+1)
 # Save the Q-value array
 #%%
 np.save("q_values.npy", q_grid)  # TODO: SUBMIT THIS Q_VALUES.NPY ARRAY
