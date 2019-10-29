@@ -6,6 +6,18 @@ BSD 3-Clause License
 Copyright (c) 2017, Pytorch contributors
 All rights reserved.
 """
+try:
+    notebook = True
+    from IPython import get_ipython
+
+    ipython = get_ipython()
+    ipython.magic("load_ext autoreload")
+    ipython.magic("autoreload 2")
+    from Exercises.Ex4.utils import Transition, ReplayMemory
+
+except:
+    notebook = False
+    from utils import Transition, ReplayMemory
 
 import numpy as np
 from collections import namedtuple
@@ -14,8 +26,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import random
-from utils import Transition, ReplayMemory
-
+# from Exercises.Ex4.utils import Transition, ReplayMemory
+# from utils import Transition, ReplayMemory
 
 class DQN(nn.Module):
     def __init__(self, state_space_dim, action_space_dim, hidden=12):
@@ -79,10 +91,10 @@ class Agent(object):
         # This is merged based on the mask, such that we'll have either the expected
         # state value or 0 in case the state was final.
         next_state_values = torch.zeros(self.batch_size)
-        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+        next_state_values[non_final_mask.bool()] = self.target_net(non_final_next_states).max(1)[0].detach()
 
         # Task 4: TODO: Compute the expected Q values
-        expected_state_action_values = 0
+        expected_state_action_values = reward_batch + self.gamma*next_state_values
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values.squeeze(),
