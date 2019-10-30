@@ -15,7 +15,8 @@ except:
     from utils import plot_rewards,plot_final_rewards
     from rbf_agent import Agent as RBFAgent  # Use for Tasks 1-3
     from dqn_agent import Agent as DQNAgent  # Task 4
-
+    import matplotlib
+    matplotlib.use('Agg')
 import gym
 import numpy as np
 from matplotlib import pyplot as plt
