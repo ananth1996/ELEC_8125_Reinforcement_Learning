@@ -8,11 +8,11 @@ try:
     ipython.magic("autoreload 2")
     from Exercises.Ex4.rbf_agent import Agent as RBFAgent  # Use for Tasks 1-3
     from Exercises.Ex4.dqn_agent import Agent as DQNAgent  # Task 4
-    from Exercises.Ex4.utils import plot_rewards
+    from Exercises.Ex4.utils import plot_rewards,plot_final_rewards
 
 except:
     notebook = False
-    from utils import plot_rewards
+    from utils import plot_rewards,plot_final_rewards
     from rbf_agent import Agent as RBFAgent  # Use for Tasks 1-3
     from dqn_agent import Agent as DQNAgent  # Task 4
 
@@ -54,7 +54,6 @@ elif "LunarLander" in env_name:
 else:
     raise ValueError("Please provide hyperparameters for %s" % env_name)
 
-
 # Get number of actions from gym action space
 n_actions = env.action_space.n
 state_space_dim = env.observation_space.shape[0]
@@ -91,7 +90,9 @@ for ep in range(num_episodes):
         agent.update_network()
         state = next_state
     cumulative_rewards.append(cum_reward)
-    plot_rewards(cumulative_rewards)
+    if ep%50 == 0:
+        print(f"Episode: {ep} Avg reward {np.mean(cumulative_rewards[max(0,ep-100):])}")
+    # plot_rewards(cumulative_rewards)
 
     # Update the target network, copying all weights and biases in DQN
     # Uncomment for Task 4
@@ -104,8 +105,10 @@ for ep in range(num_episodes):
         torch.save(agent.policy_net.state_dict(),
                   "weights_%s_%dmdl." % (env_name, ep))
 
+
 print('Complete')
-plt.ioff()
-plt.show()
+# plt.ioff()
+# plt.show()
+plot_final_rewards(cumulative_rewards,env_name)
 
 # %%

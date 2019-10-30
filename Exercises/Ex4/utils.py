@@ -49,6 +49,20 @@ def plot_rewards(rewards):
 
     plt.pause(0.001)  # pause a bit so that plots are updated
 
+def plot_final_rewards(rewards,env):
+    plt.clf()
+    rewards_t = torch.tensor(rewards, dtype=torch.float)
+    plt.title('Training...')
+    plt.xlabel('Episode')
+    plt.ylabel('Cumulative reward')
+    plt.grid(True)
+    plt.plot(rewards_t.numpy())
+    # Take 100 episode averages and plot them too
+    if len(rewards_t) >= 100:
+        means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
+        means = torch.cat((torch.zeros(99), means))
+        plt.plot(means.numpy())
+    plt.savefig(f'training_{env}.png')
 
 class DQN(nn.Module):
     def __init__(self, state_space_dim, action_space_dim, hidden=32):

@@ -72,7 +72,7 @@ class Agent(object):
 
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
-        non_final_mask = 1-torch.tensor(batch.done, dtype=torch.uint8)
+        non_final_mask = ~torch.tensor(batch.done, dtype=torch.bool)
         non_final_next_states = [s for nonfinal,s in zip(non_final_mask,
                                      batch.next_state) if nonfinal > 0]
         non_final_next_states = torch.stack(non_final_next_states)
@@ -91,7 +91,7 @@ class Agent(object):
         # This is merged based on the mask, such that we'll have either the expected
         # state value or 0 in case the state was final.
         next_state_values = torch.zeros(self.batch_size)
-        next_state_values[non_final_mask.bool()] = self.target_net(non_final_next_states).max(1)[0].detach()
+        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
 
         # Task 4: TODO: Compute the expected Q values
         expected_state_action_values = reward_batch + self.gamma*next_state_values
