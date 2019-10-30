@@ -108,24 +108,4 @@ print('Complete')
 plt.ioff()
 plt.show()
 
-# Task 3 - plot the policy
-size = 100
-x_range = np.linspace(-2.4,2.4,size)
-thetha_range = np.linspace(-0.5,0.5,size)
-xx,yy = np.meshgrid(x_range,thetha_range,indexing='ij')
-states = np.vstack((xx.flatten(),
-                     np.zeros(xx.size),
-                     yy.flatten(),
-                     np.zeros(yy.size)
-                     )
-            ).T
-features = agent.featurize(states)
-q_s = np.array([q_a.predict(features) for q_a in agent.q_functions])
-q_s = np.argmax(q_s,axis=0)
-q_s.shape = (xx.shape)
-plt.imshow(q_s.T)
-plt.xticks(range(0,size,11),np.round(x_range[::11],2),fontsize='small')
-plt.yticks(range(0,size,11), np.round(thetha_range[::11],2),fontsize='small')
-plt.legend("1","0")
-plt.show()
 # %%
