@@ -13,7 +13,7 @@ class Policy(torch.nn.Module):
         self.hidden = 64
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
-        self.sigma = torch.zeros(1)  # TODO: Implement accordingly (T1, T2)
+        self.sigma = torch.tensor([5],dtype=torch.float32)  # TODO: Implement accordingly (T1, T2)
         self.init_weights()
 
     def init_weights(self):
@@ -30,7 +30,7 @@ class Policy(torch.nn.Module):
 
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
-
+        return Normal(mu,sigma)
         # TODO: Add a layer for state value calculation (T3)
 
 
@@ -51,25 +51,34 @@ class Agent(object):
         self.states, self.action_probs, self.rewards = [], [], []
 
         # TODO: Compute discounted rewards (use the discount_rewards function)
-
+        G = discount_rewards(rewards,self.gamma)
         # TODO: Compute critic loss and advantages (T3)
 
         # TODO: Compute the optimization term (T1, T3)
+        T = len(rewards)
+        gammas = torch.tensor([self.gamma**t for t in range(T)]).to(self.train_device)
 
+        optimizer_terms = -gammas*G*action_probs
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
-
+        loss = optimizer_terms.sum()
+        loss.backward()
         # TODO: Update network parameters using self.optimizer and zero gradients (T1)
+        self.optimizer.step()
+        self.optimizer.zero_grad()
 
     def get_action(self, observation, evaluation=False):
         x = torch.from_numpy(observation).float().to(self.train_device)
 
         # TODO: Pass state x through the policy network (T1)
-
+        act_dist = self.policy.forward(x)
         # TODO: Return mean if evaluation, else sample from the distribution
         # returned by the policy (T1)
-
+        if evaluation :
+            action = act_dist.mean
+        else:
+            action = act_dist.sample()
         # TODO: Calculate the log probability of the action (T1)
-
+        act_log_prob = act_dist.log_prob(action)
         # TODO: Return state value prediction, and/or save it somewhere (T3)
 
         return action, act_log_prob
