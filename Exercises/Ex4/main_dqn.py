@@ -17,6 +17,7 @@ except:
     from dqn_agent import Agent as DQNAgent  # Task 4
     import matplotlib
     matplotlib.use('Agg')
+
 import gym
 import numpy as np
 from matplotlib import pyplot as plt
@@ -25,8 +26,8 @@ from itertools import count
 import torch
 
 
-env_name = "CartPole-v0"
-#env_name = "LunarLander-v2"
+#env_name = "CartPole-v0"
+env_name = "LunarLander-v2"
 env = gym.make(env_name)
 env.reset()
 
