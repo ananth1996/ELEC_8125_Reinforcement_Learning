@@ -48,7 +48,7 @@ if "CartPole" in env_name:
 elif "LunarLander" in env_name:
     TARGET_UPDATE = 20
     glie_a = 5000
-    num_episodes = 15000
+    num_episodes = 15#000
     hidden = 64
     gamma = 0.95
     replay_buffer_size = 50000

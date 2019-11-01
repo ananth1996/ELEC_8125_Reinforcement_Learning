@@ -18,6 +18,8 @@ try:
 except:
     notebook = False
     from utils import Transition, ReplayMemory
+    import matplotlib
+    matplotlib.use('Agg')
 
 import numpy as np
 from collections import namedtuple

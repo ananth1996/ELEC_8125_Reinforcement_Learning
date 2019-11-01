@@ -10,6 +10,8 @@ try:
 except:
     notebook = False
     from utils import ReplayMemory, Transition
+    import matplotlib
+    matplotlib.use('Agg')
 
 import gym
 import numpy as np

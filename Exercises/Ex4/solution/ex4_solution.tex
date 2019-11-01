@@ -1,0 +1,29 @@
+\documentclass[a4paper]{article}
+\usepackage[newfloat]{minted}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage[colorlinks=true, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage{subcaption}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Code}
+
+\title{RL Homework 4}
+\author{Ananth Mahadevan}
+\begin{document}
+\maketitle
+\clearpage
+
+
+\section*{Question 1}
+I think it is not possible to learn the Q-values for Cartpole from just providing linear features to a linear regression. This is because the Cartpole environment might not have linear dynamics. This then means that the state features are not enough for the Q-values to converge. This is because the linear regressor with state features has too little expressive power to capture the non-linear dynamics of the Cartpole system. This might be inherent as the stable state in the physical system might be to optimize for energy of the pole. This then means we have a quadratic dependence on the velocity of the cart and the angular speed. Hence the linear state features might be insufficien to learn 
+\section*{Question 2.1}
+\section*{Question 2.2}
+\section*{Question 2.3}
+\section*{Question 2.4}
+\section*{Question 3.1}
+\section*{Question 3.2}
+
+\end{document}

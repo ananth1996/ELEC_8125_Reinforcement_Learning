@@ -24,6 +24,8 @@ class ReplayMemory(object):
             self.memory.append(None)
         self.memory[self.position] = Transition(*args)
         self.position = (self.position + 1) % self.capacity
+        import matplotlib
+        matplotlib.use('Agg')
 
     def sample(self, batch_size):
         return random.sample(self.memory, batch_size)
@@ -62,7 +64,7 @@ def plot_final_rewards(rewards,env):
         means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
         plt.plot(means.numpy())
-    plt.savefig(f'training_{env}.png')
+    plt.savefig(f'training_{env}_Alex.png')
 
 class DQN(nn.Module):
     def __init__(self, state_space_dim, action_space_dim, hidden=32):
