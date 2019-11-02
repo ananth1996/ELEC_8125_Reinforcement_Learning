@@ -63,7 +63,37 @@ The handcrafted features are inefficient as the features are not expressive enou
 Grid based methods are not very sample efficient especially when compared to the function approximation methods. The main reason is that for grid based methods we need to sample states to specifically update a particular grid value, if we don't have many samples then a lot of the grid values end up not getting updated. This then leads to the policy not converging to an optimal value. The reason that function approximation is better and more sample efficient is that an update for a particular state also updates the whole function space, hence other states are also updated to a certain amount. This then means that we don't need to have samples to update every state but enough so that the whole function is converging to optimal values.
 \subsection*{Question 2.4}
 Hyperparameter such as the number of features or the $\epsilon$-greedy exploration value for GLIE might impact the efficiency. The number of features means that the function approximation will be more expressive for the linear methods. More features might also make the methods slower per iteration. The value of $a$ for GLIE will also affect the rate of exploration for the model and that in turn affects the efficient. Other hyperparameter might be the learning rate of the linear model, the optimizer that is used.
-\section*{Question 3.1}
-\section*{Question 3.2}
+\section*{Question 3}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{policy.png}
+    \caption{2D Policy Plot (x-axis is $x$ and y axis is $\theta$) with $\dot{x}=\dot{\theta}=0$ for the RBF features method}
+    \label{fig-policy}
+\end{figure}
 
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_CartPole-v0.png}
+        \caption{Cartpole Environment}
+        \label{fig-cartpole-DQN}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_LunarLander-v2.png}
+        \caption{Lunar Lander Environment}
+        \label{fig-lunar-DQN}
+    \end{subfigure}
+    \caption{DQN training plots for different environments}
+    \label{fig-DQN}
+\end{figure}
+\subsection*{Question 3.1}
+Q learning cannot be directly used in environments with continuous action spaces. The expected target result for the Q-value must be changed/extended to work well in situations with continuous action spaces. The easiest way to directly implement Q-learning would be to discretize the action space and then utilize Q-learning as we would. The issue with this method would be that the variance might be too high and convergence might not be guranteed. 
+\subsection*{Question 3.2}
+In Q-learning the update step consists of computing the target Q-value for the particular sample from the environment as 
+\[ Q(s,a) \leftarrow Q(s,a) + \alpha\left[ R_{t+1} +\gamma\max_{a'} Q(s',a') - Q(s,a) \right]\] 
+The biggest issue in this is finding the maximal next state action value given the current state, action and reward that is accrued. This will be impossible in environments when the action space is continuous and possibly infinite.
+
+The fix to this would be to then sample a possible action to estimate the performance of the policy. This is the idea behind \textit{action-critic} methods that do especially that, sample an action from the current policy and then compute the target with the discounted reward and the probability of taking the actions. 
 \end{document}
