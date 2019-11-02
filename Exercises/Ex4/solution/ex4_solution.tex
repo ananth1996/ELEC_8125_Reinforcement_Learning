@@ -18,11 +18,51 @@
 
 
 \section*{Question 1}
-I think it is not possible to learn the Q-values for Cartpole from just providing linear features to a linear regression. This is because the Cartpole environment might not have linear dynamics. This then means that the state features are not enough for the Q-values to converge. This is because the linear regressor with state features has too little expressive power to capture the non-linear dynamics of the Cartpole system. This might be inherent as the stable state in the physical system might be to optimize for energy of the pole. This then means we have a quadratic dependence on the velocity of the cart and the angular speed. Hence the linear state features might be insufficien to learn 
-\section*{Question 2.1}
-\section*{Question 2.2}
-\section*{Question 2.3}
-\section*{Question 2.4}
+I think it is not possible to learn the Q-values for Cartpole from just providing linear features to a linear regression. This is because the Cartpole environment might not have linear dynamics. This then means that the state features are not enough for the Q-values to converge. This is because the linear regressor with state features has too little expressive power to capture the non-linear dynamics of the Cartpole system. This might be inherent as the stable state in the physical system might be to optimize for energy of the pole. This then means we have a quadratic dependence on the velocity of the cart and the angular speed. Hence the linear state features might be insufficient to learn.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_rbf.png}
+        \caption{RBF Features}
+        \label{fig-rbf-single}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_handcrafted.png}
+        \caption{Handcrafted Features}
+        \label{fig-handcrafted-single}
+    \end{subfigure}
+    \caption{Training Plots for different methods}  
+    \label{fig-single-update}
+\end{figure}
+\section*{Task 2}
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_rbf_experience_replay.png}
+        \caption{RBF Features}
+        \label{fig-rbf-minibatch}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{training_handcrafted_experience_replay.png}
+        \caption{Handcrafted Features}
+        \label{fig-handcrafted-minibatch}
+    \end{subfigure}
+    \caption{Minibatch Update for different methods}
+    \label{fig-minibatch-update}
+\end{figure}
+\subsection*{Question 2.1}
+The RBF features with experience replay from the Figure is the most sample efficient method compared to the other methods. This method learn much faster and by around 200 episodes there is already an optimal policy. The reason that this method is most sample efficient is because it has experience replay, this allows the model to get more efficient estimate of the gradient using more samples in the minibatch. This allows the update to converge to an optimal policy using much fewer samples. The RBF features are also make the linear model more expressive.  
+\subsection*{Question 2.2}
+The handcrafted features are inefficient as the features are not expressive enough for the model. This means that the state and its absolute value are not of good quality. There are also too few features compared to the RBF features (8 vs 230). Smaller number of features usually train faster but is tradeoff for the quality. Handcrafted features can be made better by doing some feature selection on the model. Maybe we can gather more non-linear features like the square of the state or gather more based on domain experience, then we can do feature engineering/selection to choose the most important/useful features.
+\subsection*{Question 2.3}
+Grid based methods are not very sample efficient especially when compared to the function approximation methods. The main reason is that for grid based methods we need to sample states to specifically update a particular grid value, if we don't have many samples then a lot of the grid values end up not getting updated. This then leads to the policy not converging to an optimal value. The reason that function approximation is better and more sample efficient is that an update for a particular state also updates the whole function space, hence other states are also updated to a certain amount. This then means that we don't need to have samples to update every state but enough so that the whole function is converging to optimal values.
+\subsection*{Question 2.4}
+Hyperparameter such as the number of features or the $\epsilon$-greedy exploration value for GLIE might impact the efficiency. The number of features means that the function approximation will be more expressive for the linear methods. More features might also make the methods slower per iteration. The value of $a$ for GLIE will also affect the rate of exploration for the model and that in turn affects the efficient. Other hyperparameter might be the learning rate of the linear model, the optimizer that is used.
 \section*{Question 3.1}
 \section*{Question 3.2}
 
