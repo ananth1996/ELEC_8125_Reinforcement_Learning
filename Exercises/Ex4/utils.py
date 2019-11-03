@@ -26,8 +26,7 @@ class ReplayMemory(object):
             self.memory.append(None)
         self.memory[self.position] = Transition(*args)
         self.position = (self.position + 1) % self.capacity
-        import matplotlib
-        matplotlib.use('Agg')
+
 
     def sample(self, batch_size):
         return random.sample(self.memory, batch_size)
