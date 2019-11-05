@@ -36,7 +36,7 @@ class Policy(torch.nn.Module):
 
 
 class Agent(object):
-    def __init__(self, policy,baseline=0):
+    def __init__(self, policy,baseline=0,normalize=False):
         self.train_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.policy = policy.to(self.train_device)
         self.optimizer = torch.optim.RMSprop(policy.parameters(), lr=5e-3)
@@ -45,6 +45,7 @@ class Agent(object):
         self.action_probs = []
         self.rewards = []
         self.baseline = baseline
+        self.normalize = normalize
 
     def episode_finished(self, episode_number):
         action_probs = torch.stack(self.action_probs, dim=0) \
@@ -54,6 +55,8 @@ class Agent(object):
 
         # TODO: Compute discounted rewards (use the discount_rewards function)
         G = discount_rewards(rewards,self.gamma)
+        if self.normalize:
+            G = ((G-G.mean())/G.std())
         # TODO: Compute critic loss and advantages (T3)
         
         # TODO: Compute the optimization term (T1, T3)
