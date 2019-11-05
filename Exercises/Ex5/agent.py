@@ -15,7 +15,7 @@ class Policy(torch.nn.Module):
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
         self.sigma = torch.tensor([10],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
-        self.sigma = torch.nn.Parameter(self.sigma)
+        # self.sigma = torch.nn.Parameter(self.sigma)
         self.init_weights()
 
     def init_weights(self):
@@ -28,8 +28,8 @@ class Policy(torch.nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         mu = self.fc2_mean(x)
-        # sigma = self.sigma*np.e**(-5*10**(-4)*ep) 
-        sigma  = self.sigma
+        sigma = self.sigma*np.e**(-5*10**(-4)*ep) 
+        # sigma  = self.sigma
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
         return Normal(mu,sigma)
