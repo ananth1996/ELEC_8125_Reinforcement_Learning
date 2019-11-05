@@ -19,7 +19,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
 
     # Instantiate agent and its policy
     policy = Policy(observation_space_dim, action_space_dim)
-    agent = Agent(policy)
+    agent = Agent(policy,baseline=20)
 
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []
@@ -39,7 +39,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
             previous_observation = observation
 
             # Perform the action on the environment, get new state and reward
-            observation, reward, done, info = env.step(action.detach().numpy())
+            observation, reward, done, info = env.step(action.detach().cpu().numpy())
 
             # Store action's outcome (so that the agent can improve its policy)
             agent.store_outcome(previous_observation, action_probabilities, action, reward)

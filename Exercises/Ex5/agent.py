@@ -8,12 +8,13 @@ from utils import discount_rewards
 class Policy(torch.nn.Module):
     def __init__(self, state_space, action_space):
         super().__init__()
+        self.train_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.state_space = state_space
         self.action_space = action_space
         self.hidden = 64
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
-        self.sigma = torch.tensor([5],dtype=torch.float32)  # TODO: Implement accordingly (T1, T2)
+        self.sigma = torch.tensor([5],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
         self.init_weights()
 
     def init_weights(self):
@@ -35,14 +36,15 @@ class Policy(torch.nn.Module):
 
 
 class Agent(object):
-    def __init__(self, policy):
-        self.train_device = "cpu"
+    def __init__(self, policy,baseline=0):
+        self.train_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.policy = policy.to(self.train_device)
         self.optimizer = torch.optim.RMSprop(policy.parameters(), lr=5e-3)
         self.gamma = 0.98
         self.states = []
         self.action_probs = []
         self.rewards = []
+        self.baseline = baseline
 
     def episode_finished(self, episode_number):
         action_probs = torch.stack(self.action_probs, dim=0) \
@@ -53,12 +55,12 @@ class Agent(object):
         # TODO: Compute discounted rewards (use the discount_rewards function)
         G = discount_rewards(rewards,self.gamma)
         # TODO: Compute critic loss and advantages (T3)
-
+        
         # TODO: Compute the optimization term (T1, T3)
         T = len(rewards)
         gammas = torch.tensor([self.gamma**t for t in range(T)]).to(self.train_device)
 
-        optimizer_terms = -gammas*G*action_probs
+        optimizer_terms = -gammas*(G-self.baseline)*action_probs
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
         loss = optimizer_terms.sum()
         loss.backward()
