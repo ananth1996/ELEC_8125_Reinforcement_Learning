@@ -14,7 +14,7 @@ class Policy(torch.nn.Module):
         self.hidden = 64
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
-        self.sigma = torch.tensor([5],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
+        self.sigma = torch.tensor([10],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
         self.init_weights()
 
     def init_weights(self):
@@ -23,12 +23,11 @@ class Policy(torch.nn.Module):
                 torch.nn.init.normal_(m.weight)
                 torch.nn.init.zeros_(m.bias)
 
-    def forward(self, x):
+    def forward(self, x,ep):
         x = self.fc1(x)
         x = F.relu(x)
         mu = self.fc2_mean(x)
-        sigma = self.sigma  # TODO: Is it a good idea to leave it like this?
-
+        sigma = self.sigma*np.e**(-5*10**(-4)*ep)  # TODO: Is it a good idea to leave it like this?
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
         return Normal(mu,sigma)
@@ -71,11 +70,11 @@ class Agent(object):
         self.optimizer.step()
         self.optimizer.zero_grad()
 
-    def get_action(self, observation, evaluation=False):
+    def get_action(self, observation, evaluation=False,ep=0):
         x = torch.from_numpy(observation).float().to(self.train_device)
 
         # TODO: Pass state x through the policy network (T1)
-        act_dist = self.policy.forward(x)
+        act_dist = self.policy.forward(x,ep)
         # TODO: Return mean if evaluation, else sample from the distribution
         # returned by the policy (T1)
         if evaluation :

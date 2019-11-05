@@ -35,7 +35,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
         # Loop until the episode is over
         while not done:
             # Get action from the agent
-            action, action_probabilities = agent.get_action(observation)
+            action, action_probabilities = agent.get_action(observation,ep=episode_number)
             previous_observation = observation
 
             # Perform the action on the environment, get new state and reward
