@@ -3,7 +3,7 @@ import gym
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
-from agent import Agent, Policy
+from ac_agent import Agent, Policy
 from cp_cont import CartPoleEnv
 import pandas as pd
 
@@ -19,7 +19,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
 
     # Instantiate agent and its policy
     policy = Policy(observation_space_dim, action_space_dim)
-    agent = Agent(policy,baseline=0,normalize=False)
+    agent = Agent(policy,normalize=True)
 
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []
@@ -35,14 +35,14 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
         # Loop until the episode is over
         while not done:
             # Get action from the agent
-            action, action_probabilities = agent.get_action(observation,ep=episode_number)
+            action, action_probabilities,state_val = agent.get_action(observation,ep=episode_number)
             previous_observation = observation
 
             # Perform the action on the environment, get new state and reward
             observation, reward, done, info = env.step(action.detach().cpu().numpy())
 
             # Store action's outcome (so that the agent can improve its policy)
-            agent.store_outcome(previous_observation, action_probabilities, action, reward)
+            agent.store_outcome(previous_observation, action_probabilities, action, reward,state_val)
 
             # Store total episode reward
             reward_sum += reward
