@@ -18,8 +18,8 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
     observation_space_dim = env.observation_space.shape[-1]
 
     # Instantiate agent and its policy
-    policy = Policy(observation_space_dim, action_space_dim)
-    agent = Agent(policy,baseline=0,normalize=False)
+    policy = Policy(observation_space_dim, action_space_dim,sigma_type=None)
+    agent = Agent(policy,baseline=20,normalize=False)
 
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []

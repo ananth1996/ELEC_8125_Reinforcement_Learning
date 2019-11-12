@@ -6,7 +6,7 @@ from utils import discount_rewards
 
 
 class Policy(torch.nn.Module):
-    def __init__(self, state_space, action_space):
+    def __init__(self, state_space, action_space,sigma_type=None):
         super().__init__()
         self.train_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.state_space = state_space
@@ -14,8 +14,14 @@ class Policy(torch.nn.Module):
         self.hidden = 64
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
-        self.sigma = torch.tensor([np.sqrt(5)],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
-        # self.sigma = torch.nn.Parameter(self.sigma)
+        self.sigma_type = sigma_type
+        if self.sigma_type == 'expon' or self.sigma_type == 'learn':
+            self.sigma = torch.tensor([np.sqrt(10)],dtype=torch.float32,device=self.train_device)  
+        else:
+            self.sigma = torch.tensor([np.sqrt(5)],dtype=torch.float32,device=self.train_device)  
+        
+        if self.sigma_type == 'learn':
+            self.sigma = torch.nn.Parameter(self.sigma)
         self.init_weights()
 
     def init_weights(self):
@@ -28,7 +34,8 @@ class Policy(torch.nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         mu = self.fc2_mean(x)
-        # sigma = self.sigma*np.e**(-5*10**(-4)*ep) 
+        if self.sigma_type == 'expon':
+            sigma = self.sigma*np.sqrt(np.e**(-5*10**(-4)*ep))
         sigma  = self.sigma
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
