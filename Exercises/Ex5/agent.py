@@ -36,7 +36,8 @@ class Policy(torch.nn.Module):
         mu = self.fc2_mean(x)
         if self.sigma_type == 'expon':
             sigma = self.sigma*np.sqrt(np.e**(-5*10**(-4)*ep))
-        sigma  = self.sigma
+        else:
+            sigma  = self.sigma
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
         return Normal(mu,sigma)
