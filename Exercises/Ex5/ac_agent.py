@@ -65,10 +65,10 @@ class Agent(object):
         #                 )
         #         )
         G =  discount_rewards(rewards,self.gamma)
-        G = ((G-G.mean())/G.std())
+        G = ((G-G.mean())/(G.std()+1e-6))
         delta =  G - state_values
         # critic_loss = torch.mean(-delta.detach()*state_values)
-        critic_loss = torch.mean(torch.pow(delta,2))
+        critic_loss = torch.mean(torch.pow(delta,2))/2
 
         # TODO: Compute the optimization term (T1, T3)
         policy_loss = torch.mean(-delta.detach()*action_probs)
