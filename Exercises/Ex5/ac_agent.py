@@ -58,22 +58,22 @@ class Agent(object):
 
 
         # TODO: Compute critic loss and advantages (T3)
-        delta = rewards +  torch.cat((
-                    self.gamma*state_values[:1] 
-                    - state_values[:-1],
-                    -state_values[-1].unsqueeze(0)
-                        )
-                )
-        # G =  discount_rewards(rewards,self.gamma)
-        # G = ((G-G.mean())/G.std())
-        # delta =  G - state_values
-        critic_loss = torch.mean(-delta.detach()*state_values)
-        # critic_loss = torch.mean(torch.pow(delta,2))
+        # delta = rewards +  torch.cat((
+        #             self.gamma*state_values[:1] 
+        #             - state_values[:-1],
+        #             -state_values[-1].unsqueeze(0)
+        #                 )
+        #         )
+        G =  discount_rewards(rewards,self.gamma)
+        G = ((G-G.mean())/G.std())
+        delta =  G - state_values
+        # critic_loss = torch.mean(delta.detach()*state_values)
+        critic_loss = torch.mean(torch.pow(delta,2))
 
         # TODO: Compute the optimization term (T1, T3)
-        optimizer_terms = -delta.detach()*action_probs
+        policy_loss = torch.mean(-delta.detach()*action_probs)
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
-        loss = optimizer_terms.mean() + critic_loss
+        loss = policy_loss + critic_loss
         loss.backward()
         # TODO: Update network parameters using self.optimizer and zero gradients (T1)
         self.optimizer.step()
@@ -100,5 +100,5 @@ class Agent(object):
         self.states.append(observation)
         self.action_probs.append(action_prob)
         self.rewards.append(torch.Tensor([reward]))
-        self.state_values.append(torch.Tensor([state_value]))
+        self.state_values.append(state_value)
 
