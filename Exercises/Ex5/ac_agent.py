@@ -15,8 +15,8 @@ class Policy(torch.nn.Module):
         self.fc1 = torch.nn.Linear(state_space, self.hidden)
         self.fc2_mean = torch.nn.Linear(self.hidden, action_space)
         self.fc2_state_val  = torch.nn.Linear(self.hidden,1)
-        self.sigma = torch.tensor([10],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
-        # self.sigma = torch.nn.Parameter(self.sigma)
+        self.sigma = torch.tensor([np.sqrt(5)],dtype=torch.float32,device=self.train_device)  # TODO: Implement accordingly (T1, T2)
+        self.sigma = torch.nn.Parameter(self.sigma)
         self.init_weights()
 
     def init_weights(self):
@@ -29,8 +29,7 @@ class Policy(torch.nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         mu = self.fc2_mean(x)
-        sigma = self.sigma*np.e**(-5*10**(-4)*ep) 
-        # sigma  = self.sigma
+        sigma  = self.sigma
         # TODO: Instantiate and return a normal distribution
         # with mean mu and std of sigma (T1)
         # TODO: Add a layer for state value calculation (T3)
@@ -65,12 +64,16 @@ class Agent(object):
         #             -state_values[-1].unsqueeze(0)
         #                 )
         #         )
-        delta = discount_rewards(rewards,self.gamma) - state_values
-        critic_loss = torch.sum(delta.detach()*state_values)
+        G =  discount_rewards(rewards,self.gamma)
+        G = ((G-G.mean())/G.std())
+        delta =  G - state_values
+        critic_loss = torch.mean(-delta.detach()*state_values)
+        # critic_loss = torch.mean(torch.pow(delta,2))
+
         # TODO: Compute the optimization term (T1, T3)
-        optimizer_terms = delta.detach()*action_probs
+        optimizer_terms = -delta.detach()*action_probs
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
-        loss = optimizer_terms.sum() + critic_loss
+        loss = optimizer_terms.mean() + critic_loss
         loss.backward()
         # TODO: Update network parameters using self.optimizer and zero gradients (T1)
         self.optimizer.step()

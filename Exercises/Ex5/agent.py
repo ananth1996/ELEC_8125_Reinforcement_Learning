@@ -69,8 +69,6 @@ class Agent(object):
         # TODO: Compute critic loss and advantages (T3)
         
         # TODO: Compute the optimization term (T1, T3)
-        T = len(rewards)
-
         optimizer_terms = -(G-self.baseline)*action_probs
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
         loss = optimizer_terms.sum()
