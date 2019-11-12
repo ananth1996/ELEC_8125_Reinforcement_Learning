@@ -66,7 +66,9 @@ class Agent(object):
         self.states, self.action_probs, self.rewards, self.state_values, self.dones = [], [], [],[],[]
 
         next_vals = torch.cat((state_values[1:],extra_state_val))
-        next_vals = [ 0 if done[i] else v for i,v in enumerate(next_vals)]
+        for i in range(len(next_vals)):
+            if dones[i]:
+                next_vals[i]=0
         deltas = rewards + self.gamma*next_vals - state_values
         critic_loss = torch.mean(-deltas.detach()*state_values)
         # critic_loss = torch.mean(torch.pow(delta,2))/2s
