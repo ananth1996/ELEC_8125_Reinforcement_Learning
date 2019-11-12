@@ -65,7 +65,7 @@ class Agent(object):
         policy_loss = torch.mean(-delta.detach()*action_probs)
         loss = policy_loss + critic_loss
         loss.backward()
-        torch.nn.utils.clip_grad_norm(list(self.policy.parameters()) + list(self.value_fn.parameters()), max_norm=0.8)
+        torch.nn.utils.clip_grad_norm(list(self.policy.parameters()) , max_norm=0.8)
         self.optimizer.step()
         self.optimizer.zero_grad()
 
