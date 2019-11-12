@@ -58,7 +58,7 @@ class Agent(object):
 
 
         # TODO: Compute critic loss and advantages (T3)
-        next_states = torch.cat( state_values[1:], torch.tensor([0.]))
+        next_states = torch.cat((state_values[1:], torch.tensor([0.])))
         delta = rewards + self.gamma * next_states - state_values 
         critic_loss = torch.mean(-delta.detach()*state_values)
         # critic_loss = torch.mean(torch.pow(delta,2))/2
