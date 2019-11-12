@@ -48,12 +48,10 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
             reward_sum += reward
             timesteps += 1
 
-            if timesteps %10 == 0:
-                if done :
-                    extra_state = torch.tensor([0])
-                else:
-                    extra_state = policy.get_only_state(observation)
+            if timesteps % 10 == 0:
+                extra_state = policy.get_only_state(observation)
                 agent.update(extra_state)
+        
         if print_things:
             print("Episode {} finished. Total reward: {:.3g} ({} timesteps)"
                   .format(episode_number, reward_sum, timesteps))

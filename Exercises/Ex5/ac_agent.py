@@ -57,18 +57,15 @@ class Agent(object):
         self.states, self.action_probs, self.rewards, self.state_values = [], [], [],[]
 
 
-        # TODO: Compute critic loss and advantages (T3)
         next_states = torch.cat((state_values[1:], torch.tensor([0.])))
         delta = rewards + self.gamma * next_states - state_values 
         critic_loss = torch.mean(-delta.detach()*state_values)
         # critic_loss = torch.mean(torch.pow(delta,2))/2
 
-        # TODO: Compute the optimization term (T1, T3)
         policy_loss = torch.mean(-delta.detach()*action_probs)
-        # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
         loss = policy_loss + critic_loss
         loss.backward()
-        # TODO: Update network parameters using self.optimizer and zero gradients (T1)
+        torch.nn.utils.clip_grad_norm(list(self.policy.parameters()) + list(self.value_fn.parameters()), max_norm=0.8)
         self.optimizer.step()
         self.optimizer.zero_grad()
 
