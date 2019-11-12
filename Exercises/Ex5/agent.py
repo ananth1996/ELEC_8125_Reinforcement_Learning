@@ -70,9 +70,8 @@ class Agent(object):
         
         # TODO: Compute the optimization term (T1, T3)
         T = len(rewards)
-        gammas = torch.tensor([self.gamma**t for t in range(T)]).to(self.train_device)
 
-        optimizer_terms = -gammas*(G-self.baseline)*action_probs
+        optimizer_terms = -(G-self.baseline)*action_probs
         # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
         loss = optimizer_terms.sum()
         loss.backward()
