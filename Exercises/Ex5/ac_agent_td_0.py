@@ -62,11 +62,11 @@ class Agent(object):
         rewards = torch.stack(self.rewards, dim=0).to(self.train_device).squeeze(-1)
         state_values = torch.stack(self.state_values, dim=0).to(self.train_device).squeeze(-1)
         dones = np.array(self.dones)
-        extra_state_val = extra_state_val.float().to(self.train_device)
+        extra_state_val = extra_state_val
         self.states, self.action_probs, self.rewards, self.state_values, self.dones = [], [], [],[],[]
 
         next_vals = torch.cat((state_values[1:],extra_state_val))
-        next_vals[(dones==True).astype(np.int32)] = 0
+        next_vals = [ 0 if done[i] else v for i,v in enumerate(next_vals)]
         deltas = rewards + self.gamma*next_vals - state_values
         critic_loss = torch.mean(-deltas.detach()*state_values)
         # critic_loss = torch.mean(torch.pow(delta,2))/2s
