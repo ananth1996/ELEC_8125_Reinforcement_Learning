@@ -17,11 +17,12 @@ class Policy(torch.nn.Module):
         self.sigma_type = sigma_type
         if self.sigma_type == 'expon' or self.sigma_type == 'learn':
             self.sigma = torch.tensor([np.sqrt(10)],dtype=torch.float32,device=self.train_device)  
-        else:
+        elif self.sigma_type == 'learn':
+            self.sigma = torch.tensor([np.sqrt(10)],dtype=torch.float32,device=self.train_device)  
+            self.sigma = torch.nn.Parameter(self.sigma)
+        elif self.sigma_type is None:
             self.sigma = torch.tensor([np.sqrt(5)],dtype=torch.float32,device=self.train_device)  
         
-        if self.sigma_type == 'learn':
-            self.sigma = torch.nn.Parameter(self.sigma)
         self.init_weights()
 
     def init_weights(self):
@@ -62,15 +63,11 @@ class Agent(object):
         rewards = torch.stack(self.rewards, dim=0).to(self.train_device).squeeze(-1)
         self.states, self.action_probs, self.rewards = [], [], []
 
-        # TODO: Compute discounted rewards (use the discount_rewards function)
         G = discount_rewards(rewards,self.gamma)
         if self.normalize:
-            G = ((G-G.mean())/G.std())
-        # TODO: Compute critic loss and advantages (T3)
+            G = ((G-G.mean())/(G.std() + 1e-6))
         
-        # TODO: Compute the optimization term (T1, T3)
         optimizer_terms = -(G-self.baseline)*action_probs
-        # TODO: Compute the gradients of loss w.r.t. network parameters (T1)
         loss = optimizer_terms.sum()
         loss.backward()
         # TODO: Update network parameters using self.optimizer and zero gradients (T1)
